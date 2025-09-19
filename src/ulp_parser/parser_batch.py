@@ -8,7 +8,7 @@ class ULPResult(Structure):
     _fields_ = [
         ("url", c_char_p),
         ("login", c_char_p),
-        ("password", c_char_p),  # must match C exactly
+        ("password", c_char_p),
         ("success", c_int),
     ]
 
