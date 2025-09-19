@@ -1,0 +1,62 @@
+[project]
+name = "avknsfs"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+select = [
+    "ALL", # include all the rules, including new ones
+]
+ignore = [
+    #### modules
+    "ANN", # flake8-annotations
+    "COM", # flake8-commas
+    "C90", # mccabe complexity
+    "DJ",  # django
+    "EXE", # flake8-executable
+    "T10", # debugger
+    "TID", # flake8-tidy-imports
+
+    #### specific rules
+    "D100",   # ignore missing docs
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+    "D200",
+    "D205",
+    "D212",
+    "D400",
+    "D401",
+    "D415",
+    "S101",   # asserts
+    "E402",   # false positives for local imports
+    "E501",   # line too long
+    "TRY003", # external messages in exceptions are too verbose
+    "TD002",
+    "TD003",
+    "FIX002", # too verbose descriptions of todos
+    "EM101",  # allow `raise NotImplementedError`
+    "EM102"
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+
+[tool.basedpyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.10"
+
+[tool.uv.sources]
+avkn-rest = { git = "https://github.com/UnknownAPI/AvakinToolkit.git" }
