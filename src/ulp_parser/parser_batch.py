@@ -25,7 +25,7 @@ class ULPStats(Structure):
     _fields_ = [("total_lines", c_int), ("successful_parses", c_int), ("failed_parses", c_int), ("empty_lines", c_int)]
 
 
-@dataclass
+@dataclass(slots=True)
 class ParsedULP:
     """Python-friendly result container"""
 
