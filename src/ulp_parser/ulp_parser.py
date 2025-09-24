@@ -1,7 +1,10 @@
 import ctypes
+import os
 from abc import ABC, abstractmethod
 from ctypes import POINTER, Structure, c_char_p, c_int
 from dataclasses import dataclass
+
+module_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class ULPResult(Structure):
@@ -41,7 +44,7 @@ class ParsedULP(Credentials):
 
 class ULPParser(Parser):
     def __init__(self, format_string: str):
-        self.lib = ctypes.CDLL("./parser.dll")
+        self.lib = ctypes.CDLL(os.path.join(module_dir, "parser.dll"))
         self.format_string = format_string
         self._setup_functions()
 
