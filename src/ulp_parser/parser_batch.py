@@ -1,5 +1,4 @@
 import ctypes
-import os
 from ctypes import POINTER, Structure, c_char_p, c_int
 from typing import NamedTuple
 
@@ -46,7 +45,7 @@ class ParsedULPStats(NamedTuple):
 class ULPParser:
     """Python wrapper for the ULP parser C library"""
 
-    def __init__(self, lib_path: str = "./libulp_parser.so"):
+    def __init__(self):
         """
         Initialize the parser with the path to the compiled C library.
 
@@ -54,10 +53,7 @@ class ULPParser:
             lib_path: Path to the compiled shared library
 
         """
-        if not os.path.exists(lib_path):
-            raise FileNotFoundError(f"Library not found: {lib_path}")
-
-        self.lib = ctypes.CDLL(lib_path)
+        self.lib = ctypes.CDLL("./log_parser_batch.dll")
         self._setup_functions()
 
     def _setup_functions(self):
