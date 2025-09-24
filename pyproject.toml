@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 
 
+[tool.setuptools.package-data]
+ulp_parser = ["parser.dll"]
+
 
 [tool.ruff]
 line-length = 120
