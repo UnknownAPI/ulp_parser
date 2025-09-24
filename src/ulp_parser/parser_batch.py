@@ -45,7 +45,7 @@ class ParsedULPStats(NamedTuple):
 class ULPParser:
     """Python wrapper for the ULP parser C library"""
 
-    def __init__(self):
+    def __init__(self, format_string: str):
         """
         Initialize the parser with the path to the compiled C library.
 
@@ -54,6 +54,7 @@ class ULPParser:
 
         """
         self.lib = ctypes.CDLL("./log_parser_batch.dll")
+        self.format_string = format_string
         self._setup_functions()
 
     def _setup_functions(self):
@@ -84,15 +85,12 @@ class ULPParser:
         self.lib.get_ulp_stats.argtypes = [POINTER(ULPResultArray), c_char_p]
         self.lib.get_ulp_stats.restype = ULPStats
 
-    def parse(self, input_string: str, format_string: str) -> ParsedULP:
+    def parse(self, input_string: str) -> ParsedULP:
         """
         Parse a ULP log entry.
 
         Args:
             input_string: The log entry to parse (e.g., "https://site.com:user:pass")
-            format_string: Format specification (e.g., "u:l:p", "l,p,u")
-                          - u = URL, l = login, p = password
-                          - Characters between letters specify the separator
 
         Returns:
             ParsedULP object with url, login, password fields and success flag
@@ -100,7 +98,7 @@ class ULPParser:
         """
         # Convert strings to bytes for C
         input_bytes = input_string.encode("utf-8")
-        format_bytes = format_string.encode("utf-8")
+        format_bytes = self.format_string.encode("utf-8")
 
         # Call C function
         result_ptr = self.lib.parse_ulp_alloc(input_bytes, format_bytes)
@@ -122,61 +120,19 @@ class ULPParser:
             # Always free the allocated memory
             self.lib.free_ulp_result_ptr(result_ptr)
 
-    def parse_file_content(self, content: str, format_string: str) -> list[ParsedULP]:
-        """
-        Parse ULP entries from file content string.
-
-        Args:
-            content: File content as string (with newlines)
-            format_string: Format specification (e.g., "u:l:p", "l,p,u")
-
-        Returns:
-            List of ParsedULP objects
-
-        """
-        content_bytes = content.encode("utf-8")
-        format_bytes = format_string.encode("utf-8")
-
-        array_ptr = self.lib.parse_ulp_file(content_bytes, format_bytes)
-
-        if not array_ptr:
-            return []
-
-        try:
-            results = []
-            count = self.lib.get_array_count(array_ptr)
-
-            for i in range(count):
-                element_ptr = self.lib.get_array_element(array_ptr, i)
-                if element_ptr:
-                    result = element_ptr.contents
-
-                    url = result.url.decode("utf-8", errors="ignore") if result.url else None
-                    login = result.login.decode("utf-8", errors="ignore") if result.login else None
-                    password = result.password.decode("utf-8", errors="ignore") if result.password else None
-                    success = bool(result.success)
-
-                    results.append(ParsedULP(url, login, password, success))
-
-            return results
-
-        finally:
-            self.lib.free_ulp_result_array_ptr(array_ptr)
-
-    def parse_file(self, filename: str, format_string: str) -> list[ParsedULP]:
+    def parse_file(self, filename: str) -> list[ParsedULP]:
         """
         Parse ULP entries from a file.
 
         Args:
             filename: Path to the file to parse
-            format_string: Format specification (e.g., "u:l:p", "l,p,u")
 
         Returns:
             List of ParsedULP objects
 
         """
         filename_bytes = filename.encode("utf-8")
-        format_bytes = format_string.encode("utf-8")
+        format_bytes = self.format_string.encode("utf-8")
 
         array_ptr = self.lib.parse_ulp_from_file(filename_bytes, format_bytes)
 
@@ -201,36 +157,5 @@ class ULPParser:
 
             return results
 
-        finally:
-            self.lib.free_ulp_result_array_ptr(array_ptr)
-
-    def get_stats(self, content: str, format_string: str) -> ParsedULPStats:
-        """
-        Get parsing statistics for content.
-
-        Args:
-            content: File content as string
-            format_string: Format specification
-
-        Returns:
-            ParsedULPStats with parsing statistics
-
-        """
-        content_bytes = content.encode("utf-8")
-        format_bytes = format_string.encode("utf-8")
-
-        array_ptr = self.lib.parse_ulp_file(content_bytes, format_bytes)
-
-        if not array_ptr:
-            return ParsedULPStats(0, 0, 0, 0)
-
-        try:
-            stats = self.lib.get_ulp_stats(array_ptr, content_bytes)
-            return ParsedULPStats(
-                total_lines=stats.total_lines,
-                successful_parses=stats.successful_parses,
-                failed_parses=stats.failed_parses,
-                empty_lines=stats.empty_lines,
-            )
         finally:
             self.lib.free_ulp_result_array_ptr(array_ptr)
