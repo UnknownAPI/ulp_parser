@@ -17,7 +17,7 @@ class ULPResultArray(Structure):
     _fields_ = [("results", POINTER(ULPResult)), ("count", c_int), ("capacity", c_int)]
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Credentials:
     login: str | None
     password: str | None
@@ -29,11 +29,11 @@ class Parser(ABC):
         pass
 
     def parse_file(self, filename: str) -> list[Credentials]:
-        with open(filename) as f:
+        with open(filename, errors="ignore") as f:
             return [self.parse(line) for line in f]
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class ParsedULP(Credentials):
     url: str | None
     success: bool = False
