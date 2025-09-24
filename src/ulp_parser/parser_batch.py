@@ -1,5 +1,6 @@
 import ctypes
 from ctypes import POINTER, Structure, c_char_p, c_int
+from dataclasses import dataclass
 from typing import NamedTuple
 
 
@@ -24,7 +25,8 @@ class ULPStats(Structure):
     _fields_ = [("total_lines", c_int), ("successful_parses", c_int), ("failed_parses", c_int), ("empty_lines", c_int)]
 
 
-class ParsedULP(NamedTuple):
+@dataclass
+class ParsedULP:
     """Python-friendly result container"""
 
     url: str | None
