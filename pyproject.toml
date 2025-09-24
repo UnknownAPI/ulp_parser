@@ -1,5 +1,5 @@
 [project]
-name = "avknsfs"
+name = "ulp_parser"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -57,6 +57,3 @@ asyncio_mode = "auto"
 venvPath = "."
 venv = ".venv"
 pythonVersion = "3.10"
-
-[tool.uv.sources]
-avkn-rest = { git = "https://github.com/UnknownAPI/AvakinToolkit.git" }
