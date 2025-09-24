@@ -1,5 +1,9 @@
 [project]
+<<<<<<< HEAD
 name = "ulp_parser"
+=======
+name = "ULP parser"
+>>>>>>> 5f0c99a2a2b86025e68b6131e8a7392651ce23f1
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
