@@ -1,5 +1,6 @@
 import ctypes
 import os
+import platform
 from abc import ABC, abstractmethod
 from ctypes import POINTER, Structure, c_char_p, c_int
 from dataclasses import dataclass
@@ -44,7 +45,17 @@ class ParsedULP(Credentials):
 
 class ULPParser(Parser):
     def __init__(self, format_string: str):
-        self.lib = ctypes.CDLL(os.path.join(module_dir, "parser.dll"))
+        system = platform.system()
+        if system == "Linux":
+            libname = "parser.so"
+        elif system == "Windows":
+            libname = "parser.dll"
+        elif system == "Darwin":  # macOS
+            libname = "parser.dylib"
+        else:
+            raise OSError(f"Unsupported operating system: {system}")
+
+        self.lib = ctypes.CDLL(os.path.join(module_dir, libname))
         self.format_string = format_string
         self._setup_functions()
 
